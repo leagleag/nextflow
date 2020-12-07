@@ -24,6 +24,13 @@
 &emsp;7.4. [Transition from dsl to dsl2](#transition-from-dsl-to-dsl2)   
 &emsp;&emsp;7.4.1. [Some guidelines](#some-guidelines)   
 &emsp;&emsp;7.4.2. [A workflow example](#a-workflow-example)   
+8. [Bioinformatics pipeline example](#bioinformatics-pipeline-example)   
+&emsp;8.1. [data description](#data-description)   
+&emsp;&emsp;8.1.1. [genome assembly `genome.fa`](#genome-assembly-genomefa)   
+&emsp;&emsp;8.1.2. [RNAseq reads](#rnaseq-reads)   
+&emsp;&emsp;8.1.3. [variant file](#variant-file)   
+&emsp;&emsp;8.1.4. [blacklisted regions](#blacklisted-regions)   
+&emsp;8.2. [workflow](#workflow)   
 
 <!-- /MDTOC -->
 
@@ -207,3 +214,43 @@ Note:
  - use name assignment in ``emit:`` (``assign_name = task1.out``) if possible
  - workflows can be called by name using command line: ``nextflow run <filename.nf> -entry <workflow_name>``
  - workflow without names is ignored if imported into another one.
+
+# Bioinformatics pipeline example
+## data description
+Retrieve data for the [tutorial](https://seqera.io/training/handson/#_data_description).
+### genome assembly `genome.fa`
+Genome assembly hg19 from genbank - chr22 only [here](https://www.ncbi.nlm.nih.gov/nuccore/CM000684.1)
+
+### RNAseq reads
+Expect 6 bam files ranging 17-35gb per file; leading to 12 fastq files
+
+ - Download the following files and check md5 sums.
+| sample | isogenic replicate 1; alignment hg19| isogenic replicate 2; alignment hg19 |
+|---|---|---|
+| ENCSR000COQ (whole cell) |ENCFF664VNB|ENCFF790WER|
+| ENCSR000CPO (nuclear) |ENCFF009TYW|ENCFF149PXU|
+| ENCSR000COR (cytosol) |ENCFF705WOW|ENCFF367BKI|
+
+ - Then we need to retrieve reads mapping chr 22 only into fastq; we use samtools. Get samtools with this docker [image](https://github.com/chrishah/samtools-docker/blob/master/Dockerfile).
+
+ ``docker run -it -v /c/Users/User/Desktop/data:/test 288856f3b2ca /bin/bash``
+
+ - create index
+ ``samtools index ENCFF664VNB.bam``
+ - extract reads for locus 22q11
+ ``samtools view -h ENCFF664VNB.bam chr22:16000000-18000000 > ENCFF664VNB_chr22.bam``
+ - output paired reads to separate files, discarding singletons into fastq
+ ``samtools fastq -1 ENCSR000COQ1_1.fastq -2 ENCSR000COQ1_2.fastq -0 /dev/null -n ENCFF664VNB_chr22.bam``
+
+### variant file
+ - variants are coming from Illumina. Get the data and the index file ``tbi``.
+ ``wget ftp://ussd-ftp.illumina.com/2017-1.0/hg19/small_variants/NA12878/NA12878.vcf.gz``
+ - Then subset the variants to keep only those matching chr 22 using [vcftools](https://vcftools.github.io/man_latest.html#EXAMPLES).
+ ``vcftools --gzvcf  NA12878.vcf.gz --chr chr22 --recode --out NA12878_chr22``
+ Note: output file is NA12878_chr22.recode.vcf
+
+### blacklisted regions
+This is a bed file.
+https://www.encodeproject.org/files/ENCFF001TDO/
+
+## workflow
