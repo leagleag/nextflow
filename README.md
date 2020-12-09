@@ -217,7 +217,7 @@ Note:
 
 # Bioinformatics pipeline example
 ## data description
-Retrieve data for the [tutorial](https://seqera.io/training/handson/#_data_description).
+All data is available at this [git repo](https://github.com/nextflow-io/nf-hack18/tree/master/hands-on). Retrieve data for the [tutorial](https://seqera.io/training/handson/#_data_description).
 ### genome assembly `genome.fa`
 Genome assembly hg19 from genbank - chr22 only [here](https://www.ncbi.nlm.nih.gov/nuccore/CM000684.1)
 
@@ -254,3 +254,5 @@ This is a bed file.
 https://www.encodeproject.org/files/ENCFF001TDO/
 
 ## workflow
+### run on win10 using gitbash
+ ``winpty docker run -it --rm -v "C:\\Users\\User\\Desktop\\data\\nextflow:/test" nextflow/nextflow bash -c "nextflow run /test/hands-on/main.nf"``
