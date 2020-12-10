@@ -60,3 +60,29 @@ process "p1C_prepare_star_genome_index" {
   '
   """
 }
+
+/*
+ * Process 1D: Create a file containing the filtered and recoded set of variants
+ */
+process "p1D_prepare_vcf_file" {
+
+  input:
+  path variantsFile
+  path blacklisted
+
+  output:
+  tuple path("${variantsFile.baseName}.filtered.recode.vcf.gz"), \
+  path("${variantsFile.baseName}.filtered.recode.vcf.gz.tbi")
+
+  script:
+  """
+  docker run -w \$(pwd) --volumes-from workspace cbcrg/callings-with-gatk:latest bash -c '
+  vcftools --gzvcf $variantsFile -c \
+           --exclude-bed ${blacklisted} \
+           --recode | bgzip -c \
+           > ${variantsFile.baseName}.filtered.recode.vcf.gz
+
+  tabix ${variantsFile.baseName}.filtered.recode.vcf.gz
+  '
+  """
+}
