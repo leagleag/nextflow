@@ -50,7 +50,7 @@ process "p1C_prepare_star_genome_index" {
 
   script:
   """
-  docker run -w \$(pwd) --volumes-from workspace cbcrg/callings-with-gatk:latest bash -c '
+  docker run -w \$(pwd) --volumes-from workspace cbcrg/callings-with-gatk:latest bash -c '\
   mkdir genome_dir
 
   STAR --runMode genomeGenerate \
@@ -76,7 +76,7 @@ process "p1D_prepare_vcf_file" {
 
   script:
   """
-  docker run -w \$(pwd) --volumes-from workspace cbcrg/callings-with-gatk:latest bash -c '
+  docker run -w \$(pwd) --volumes-from workspace cbcrg/callings-with-gatk:latest bash -c '\
   vcftools --gzvcf $variantsFile -c \
            --exclude-bed ${blacklisted} \
            --recode | bgzip -c \

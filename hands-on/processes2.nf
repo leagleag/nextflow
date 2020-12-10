@@ -19,7 +19,7 @@ process "p2_rnaseq_mapping_star" {
 
   script:
   """
-  docker run -w \$(pwd) --volumes-from workspace cbcrg/callings-with-gatk:latest bash -c '
+  docker run -w \$(pwd) --volumes-from workspace cbcrg/callings-with-gatk:latest bash -c '\
   # ngs-nf-dev Align reads to genome
   STAR --genomeDir $genome_index \
        --readFilesIn $paired_reads \
