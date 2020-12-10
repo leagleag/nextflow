@@ -6,6 +6,7 @@ nextflow.enable.dsl=2
  * Process 2: Align RNA-Seq reads to the genome with STAR
  */
 process "p2_rnaseq_mapping_star" {
+  tag "$replicateId"
 
   input:
   path(genome)
