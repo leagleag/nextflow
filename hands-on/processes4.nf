@@ -19,8 +19,8 @@ process "p4_rnaseq_gatk_recalibrate" {
   tuple path(recoded_vcf), path(tab_index)
 
   output:
-  tuple val(sampleId), path("${replicateId}.final.uniq.bam"), \
-  path("${replicateId}.final.uniq.bam.bai")
+  tuple val(sampleId), path("${replicateId}.final.uniq.bam"), emit: sample_bams
+  tuple val(sampleId), path("${replicateId}.final.uniq.bam.bai"), emit: sample_bais
 
   script:
   sampleId = replicateId.replaceAll(/[12]$/,'')
