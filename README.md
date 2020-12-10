@@ -260,6 +260,10 @@ https://www.encodeproject.org/files/ENCFF001TDO/
 - use nextflow dsl2
 - Map the socket file. The socket is passed to be able to pull docker images from the nextflow container as a sibling container. For example:
 ``winpty docker run -it -v "C:\\Users\\User\\Desktop\\data\\nextflow:/test" -v "//var/run/docker.sock:/var/run/docker.sock" nextflow/nextflow bash -c "docker pull cbcrg/callings-with-gatk:latest"``
+### fixing the resume capability
+- Since nextflow is running on docker; `-resume` will work only if the container is kept running. This is the function of `tail -f /dev/null`.
+- Launch the project with: `winpty docker run -it --volumes-from workspace --name nextflow_container nextflow/nextflow bash -c "nextflow run /nextflow_data/hands-on/main.nf -dsl2; tail -f /dev/null"`
+- Then resume with: `winpty docker exec -it nextflow_container bash -c "nextflow run /nextflow_data/hands-on/main.nf -dsl2 -resume; tail -f /dev/null"`
 
 ### Nextflow specifics
 - $baseDir is the path of `main.nf`
