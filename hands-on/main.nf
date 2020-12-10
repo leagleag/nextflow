@@ -15,9 +15,14 @@ reads_ch          = Channel.fromFilePairs(params.reads)
 GATK              = params.gatk
 */
 
-include {p1A_prepare_genome_samtools; p1B_prepare_genome_picard} from './processes1.nf'
+include {
+  p1A_prepare_genome_samtools;
+  p1B_prepare_genome_picard;
+  p1C_prepare_star_genome_index
+  } from './processes1.nf'
 
 workflow {
   p1A_prepare_genome_samtools(params.genome)
   p1B_prepare_genome_picard(params.genome)
+  p1C_prepare_star_genome_index(params.genome)
 }

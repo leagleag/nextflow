@@ -36,3 +36,27 @@ process "p1B_prepare_genome_picard" {
   docker run -w \$(pwd) --volumes-from workspace cbcrg/callings-with-gatk:latest bash -c 'PICARD=`which picard.jar`; java -jar \$PICARD CreateSequenceDictionary R= $genome O= ${genome.baseName}.dict'
   """
 }
+
+/*
+ * Process 1C: Create the genome index file for STAR
+ */
+process "p1C_prepare_star_genome_index" {
+
+  input:
+  path genome
+
+  output:
+  path genome_dir
+
+  script:
+  """
+  docker run -w \$(pwd) --volumes-from workspace cbcrg/callings-with-gatk:latest bash -c '
+  mkdir genome_dir
+
+  STAR --runMode genomeGenerate \
+       --genomeDir genome_dir \
+       --genomeFastaFiles ${genome} \
+       --runThreadN ${task.cpus}
+  '
+  """
+}
