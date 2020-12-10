@@ -253,6 +253,13 @@ Expect 6 bam files ranging 17-35gb per file; leading to 12 fastq files
 This is a bed file.
 https://www.encodeproject.org/files/ENCFF001TDO/
 
-## workflow
-### run on win10 using gitbash
- ``winpty docker run -it --rm -v "C:\\Users\\User\\Desktop\\data\\nextflow:/test" nextflow/nextflow bash -c "nextflow run /test/hands-on/main.nf"``
+## Workflow
+### Nextflow running on win10 using gitbash
+- use a volume container `workspace` such as `docker run --name workspace -v "C:\\Users\\User\\Desktop\\data\\nextflow:/nextflow_data" -v "//var/run/docker.sock:/var/run/docker.sock" ubuntu:18.04`. This solves path mapping problems when docker containers are used in nextflow processes.
+- ``winpty docker run -it --volumes-from workspace nextflow/nextflow bash -c "nextflow run /nextflow_data/hands-on/main.nf -dsl2"``
+- use nextflow dsl2
+- Map the socket file. The socket is passed to be able to pull docker images from the nextflow container as a sibling container. For example:
+``winpty docker run -it -v "C:\\Users\\User\\Desktop\\data\\nextflow:/test" -v "//var/run/docker.sock:/var/run/docker.sock" nextflow/nextflow bash -c "docker pull cbcrg/callings-with-gatk:latest"``
+
+### Nextflow specifics
+$baseDir is the path of `main.nf`
