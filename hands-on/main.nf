@@ -32,6 +32,10 @@ include {
   p4_rnaseq_gatk_recalibrate;
 } from './processes4.nf'
 
+include {
+  p5_rnaseq_call_variants;
+} from './processes5.nf'
+
 workflow {
   p1A_prepare_genome_samtools(params.genome)
   genome_index_sam = p1A_prepare_genome_samtools.out
@@ -57,6 +61,17 @@ workflow {
     genome_dict_picard,
     p3_rnaseq_gatk_splitNcigar.out,
     p1D_prepare_vcf_file.out,
+  )
+  bam_sample_ch = p4_rnaseq_gatk_recalibrate.out.sample_bams.join(
+      p4_rnaseq_gatk_recalibrate.out.sample_bais
+  )
+
+
+  p5_rnaseq_call_variants(
+    params.genome,
+    genome_index_sam,
+    genome_dict_picard,
+    bam_sample_ch,
   )
 
 }
