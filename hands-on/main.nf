@@ -7,6 +7,8 @@ params.variants   = "$baseDir/data/known_variants.vcf.gz"
 params.blacklist  = "$baseDir/data/blacklist.bed"
 params.reads      = "$baseDir/data/reads/ENCSR000COQ1_{1,2}.fastq.gz"
 
+params.gatk = "/opt/broad/GenomeAnalysisTK.jar"
+GATK = params.gatk
 /*
 params.results    = "results"
 */
@@ -26,6 +28,10 @@ include {
   p3_rnaseq_gatk_splitNcigar;
 } from './processes3.nf'
 
+include {
+  p4_rnaseq_gatk_recalibrate;
+} from './processes4.nf'
+
 workflow {
   p1A_prepare_genome_samtools(params.genome)
   genome_index_sam = p1A_prepare_genome_samtools.out
@@ -44,4 +50,13 @@ workflow {
     genome_dict_picard,
     p2_rnaseq_mapping_star.out,
   )
+
+  p4_rnaseq_gatk_recalibrate(
+    params.genome,
+    genome_index_sam,
+    genome_dict_picard,
+    p3_rnaseq_gatk_splitNcigar.out,
+    p1D_prepare_vcf_file.out,
+  )
+
 }
