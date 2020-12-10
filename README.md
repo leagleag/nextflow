@@ -262,4 +262,5 @@ https://www.encodeproject.org/files/ENCFF001TDO/
 ``winpty docker run -it -v "C:\\Users\\User\\Desktop\\data\\nextflow:/test" -v "//var/run/docker.sock:/var/run/docker.sock" nextflow/nextflow bash -c "docker pull cbcrg/callings-with-gatk:latest"``
 
 ### Nextflow specifics
-$baseDir is the path of `main.nf`
+- $baseDir is the path of `main.nf`
+- `include` does not seem to support names starting with a digit.
