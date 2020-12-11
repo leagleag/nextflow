@@ -9,9 +9,6 @@ params.reads      = "$baseDir/data/reads/ENCSR000COQ1_{1,2}.fastq.gz"
 
 params.gatk = "/opt/broad/GenomeAnalysisTK.jar"
 GATK = params.gatk
-/*
-params.results    = "results"
-*/
 
 include {
   p1A_prepare_genome_samtools;
@@ -35,6 +32,11 @@ include {
 include {
   p5_rnaseq_call_variants;
 } from './processes5.nf'
+
+include {
+  p6A_post_process_vcf;
+  p6B_prepare_vcf_for_ase;
+} from './processes6.nf'
 
 workflow {
   p1A_prepare_genome_samtools(params.genome)
@@ -66,12 +68,16 @@ workflow {
       p4_rnaseq_gatk_recalibrate.out.sample_bais
   )
 
-
   p5_rnaseq_call_variants(
     params.genome,
     genome_index_sam,
     genome_dict_picard,
     bam_sample_ch,
+  )
+
+  p6A_post_process_vcf(
+    p5_rnaseq_call_variants.out,
+    p1D_prepare_vcf_file.out,
   )
 
 }
