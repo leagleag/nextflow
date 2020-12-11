@@ -7,9 +7,6 @@ params.variants   = "$baseDir/data/known_variants.vcf.gz"
 params.blacklist  = "$baseDir/data/blacklist.bed"
 params.reads      = "$baseDir/data/reads/ENCSR000COQ1_{1,2}.fastq.gz"
 
-params.gatk = "/opt/broad/GenomeAnalysisTK.jar"
-GATK = params.gatk
-
 include {
   p1A_prepare_genome_samtools;
   p1B_prepare_genome_picard;
