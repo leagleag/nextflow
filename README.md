@@ -219,7 +219,6 @@ Note:
 ## data description
 All data is available at this [git repo](https://github.com/nextflow-io/nf-hack18/tree/master/hands-on). Retrieve data for the [tutorial](https://seqera.io/training/handson/#_data_description).
 ### genome assembly `genome.fa`
-Genome assembly hg19 from genbank - chr22 only [here](https://www.ncbi.nlm.nih.gov/nuccore/CM000684.1)
 Genome assembly GRCh37/hg19 from genbank - chr22 only [here](https://www.ncbi.nlm.nih.gov/nuccore/CM000684.1); make sure to replace the name of chromosome from `CM000684.1` to `chr22` or there will be conflicts in the pipeline.
 
 ### RNAseq reads
