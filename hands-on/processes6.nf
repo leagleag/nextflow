@@ -58,7 +58,7 @@ process "p6B_prepare_vcf_for_ase" {
                {print \\\$v[1]/(\\\$v[1]+\\\$v[0]).\\"\\\\n\\"; }" |awk "\\\$1!=1" \
                > AF.4R
 
-  Rscript /nextflow_data/hands-on/bin/gghist.R -i AF.4R -o AF.histogram.pdf
+  Rscript ${script_path}/gghist.R -i AF.4R -o AF.histogram.pdf
   '
   """
 }
