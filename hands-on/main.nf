@@ -77,4 +77,8 @@ workflow {
     p1D_prepare_vcf_file.out,
   )
 
+  p6B_prepare_vcf_for_ase(
+    p6A_post_process_vcf.out,
+  )
+
 }

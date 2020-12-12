@@ -29,3 +29,36 @@ process "p6A_post_process_vcf" {
   """
 }
 
+/*
+ * Process 6B: prepare the VCF for allele specific expression (ASE) and
+ * generate a figure in R.
+ */
+process "p6B_prepare_vcf_for_ase" {
+  tag "$sampleId"
+  publishDir "${params.results}/$sampleId"
+
+  input:
+  tuple val(sampleId), path(vcf), path(snps)
+
+  output:
+  tuple val(sampleId), path("known_snps.vcf"), emit: known_snps
+  path("AF.histogram.pdf"), emit: figure
+
+  script:
+  """
+  docker run -w \$(pwd) --volumes-from workspace cbcrg/callings-with-gatk:latest bash -c '\
+
+  awk "BEGIN{OFS=\\"\\\\t\\"} \\\$4~/B/{print \\\$1,\\\$2,\\\$3}" commonSNPs.diff.sites_in_files > test.bed
+
+  vcftools --vcf final.vcf --bed test.bed --recode --keep-INFO-all --stdout > known_snps.vcf
+
+  grep -v "#"  known_snps.vcf | awk -F "\\\\t" "{print \\\$10}" \
+               | awk -F ":" "{print \\\$2}" | perl -ne "chomp(\\\$_); \
+               @v=split(/\\\\,/,\\\$_); if(\\\$v[0]!=0 || \\\$v[1]!=0) \
+               {print \\\$v[1]/(\\\$v[1]+\\\$v[0]).\\"\\\\n\\"; }" |awk "\\\$1!=1" \
+               > AF.4R
+
+  Rscript /nextflow_data/hands-on/bin/gghist.R -i AF.4R -o AF.histogram.pdf
+  '
+  """
+}
