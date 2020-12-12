@@ -15,10 +15,10 @@ process "p5_rnaseq_call_variants" {
   path(genome)
   path(genome_index_sam)
   path(genome_picard_dict)
-  tuple val(replicateId), path(bam), path(bai)
+  tuple val(sampleId), path(bam), path(bai)
 
   output:
-  tuple val("$sampleId"), path("final.vcf")
+  tuple val(sampleId), path("final.vcf")
 
   script:
   """
