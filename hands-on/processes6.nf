@@ -2,7 +2,9 @@
 
 nextflow.enable.dsl=2
 
-params.results = "results"
+params.results = "$baseDir/results"
+params.gatk = "/opt/broad/GenomeAnalysisTK.jar"
+GATK = params.gatk
 
 /*
  * Process 6A: process the VCF result to prepare variants file for allele
@@ -10,7 +12,7 @@ params.results = "results"
  */
 process "p6A_post_process_vcf" {
   tag "$sampleId"
-  publishDir "${params.results}/$sampleId"
+  publishDir "${params.results}/$sampleId", mode: "copy", overwrite: true
 
   input:
   tuple val(sampleId), path("final.vcf")
@@ -35,7 +37,7 @@ process "p6A_post_process_vcf" {
  */
 process "p6B_prepare_vcf_for_ase" {
   tag "$sampleId"
-  publishDir "${params.results}/$sampleId"
+  publishDir "${params.results}/$sampleId", mode: "copy", overwrite: true
 
   input:
   tuple val(sampleId), path(vcf), path(snps)
