@@ -33,6 +33,7 @@ include {
 include {
   p6A_post_process_vcf;
   p6B_prepare_vcf_for_ase;
+  p6C_ASE_knownSNPs;
 } from './processes6.nf'
 
 workflow {
@@ -72,6 +73,15 @@ workflow {
     bam_sample_ch,
   )
 
+  // <id, vcf, list(bam), list(bai)>
+  bam_sample_ch
+    .groupTuple()
+    .join(p5_rnaseq_call_variants.out)
+    .map{sampleId, bam, bai, vcf ->
+      tuple(sampleId, vcf, bam, bai)
+    }
+    .set{ grouped_vcf_bam_bai_ch }
+
   p6A_post_process_vcf(
     p5_rnaseq_call_variants.out,
     p1D_prepare_vcf_file.out,
@@ -79,6 +89,13 @@ workflow {
 
   p6B_prepare_vcf_for_ase(
     p6A_post_process_vcf.out,
+  )
+
+  p6C_ASE_knownSNPs(
+    params.genome,
+    genome_index_sam,
+    genome_dict_picard,
+    grouped_vcf_bam_bai_ch,
   )
 
 }

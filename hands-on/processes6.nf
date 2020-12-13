@@ -62,3 +62,33 @@ process "p6B_prepare_vcf_for_ase" {
   '
   """
 }
+
+/*
+ * Process 6C: calculate allele counts at a set of positions with GATK tools
+ */
+process "p6C_ASE_knownSNPs" {
+  tag "$sampleId"
+  publishDir "${params.results}/$sampleId", mode: "copy", overwrite: true
+
+  input:
+  path(genome)
+  path(genome_index_sam)
+  path(genome_picard_dict)
+  tuple val(sampleId), path(vcf), path(bam), path(bai)
+
+  output:
+  path("ASE.tsv")
+
+  script:
+  """
+  docker run -w \$(pwd) --volumes-from workspace cbcrg/callings-with-gatk:latest bash -c '\
+  echo "${bam.join('\n')}" > bam.list
+
+  java -jar $GATK -R $genome \
+                  -T ASEReadCounter \
+                  -o ASE.tsv \
+                  -I bam.list \
+                  -sites $vcf
+  '
+  """
+}
