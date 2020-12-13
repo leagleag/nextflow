@@ -259,6 +259,25 @@ https://www.encodeproject.org/files/ENCFF001TDO/
 
 ## Workflow
 ### TLDR how to run this
+- There are 4 main directories.
+ - `bin`: we put some scripts the pipeline uses here.
+ - `data`: to put all input data.
+ - `results`: to write permanent result files
+ - the nextflow directory in which the `work` nextflow directory is created by default.
+  ```
+  C:.
+  └───nextflow
+      ├───handson
+      |   ├───bin
+      │   ├───data
+      │   │   └───reads
+      │   └───results
+      │       ├───ENCSR000COQ
+      │       ├───ENCSR000COR
+      │       └───ENCSR000CPO
+      └───work
+  ```
+
 - To start the first time. ``winpty docker run -it --volumes-from workspace --name nextflow_container nextflow/nextflow bash -c "nextflow run /nextflow_data/hands-on/main.nf -dsl2 -resume; tail -f /dev/null"``
 - If the container is not running. ``docker container start nextflow_container``
 - Rerun project. ``winpty docker exec -it nextflow_container bash -c "nextflow run /nextflow_data/hands-on/main.nf -dsl2 -resume; tail -f /dev/null"``
