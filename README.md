@@ -30,7 +30,11 @@
 &emsp;&emsp;8.1.2. [RNAseq reads](#rnaseq-reads)   
 &emsp;&emsp;8.1.3. [variant file](#variant-file)   
 &emsp;&emsp;8.1.4. [blacklisted regions](#blacklisted-regions)   
-&emsp;8.2. [workflow](#workflow)   
+&emsp;8.2. [Workflow](#workflow)   
+&emsp;&emsp;8.2.1. [TLDR how to run this](#tldr-how-to-run-this)   
+&emsp;&emsp;8.2.2. [Nextflow running on win10 using gitbash](#nextflow-running-on-win10-using-gitbash)   
+&emsp;&emsp;8.2.3. [fixing the resume capability](#fixing-the-resume-capability)   
+&emsp;&emsp;8.2.4. [Nextflow specifics](#nextflow-specifics)   
 
 <!-- /MDTOC -->
 
@@ -217,9 +221,9 @@ Note:
 
 # Bioinformatics pipeline example
 ## data description
-Retrieve data for the [tutorial](https://seqera.io/training/handson/#_data_description).
+All data is available at this [git repo](https://github.com/nextflow-io/nf-hack18/tree/master/hands-on). Retrieve data for the [tutorial](https://seqera.io/training/handson/#_data_description).
 ### genome assembly `genome.fa`
-Genome assembly hg19 from genbank - chr22 only [here](https://www.ncbi.nlm.nih.gov/nuccore/CM000684.1)
+Genome assembly GRCh37/hg19 from genbank - chr22 only [here](https://www.ncbi.nlm.nih.gov/nuccore/CM000684.1); make sure to replace the name of chromosome from `CM000684.1` to `chr22` or there will be conflicts in the pipeline.
 
 ### RNAseq reads
 Expect 6 bam files ranging 17-35gb per file; leading to 12 fastq files
@@ -253,4 +257,43 @@ Expect 6 bam files ranging 17-35gb per file; leading to 12 fastq files
 This is a bed file.
 https://www.encodeproject.org/files/ENCFF001TDO/
 
-## workflow
+## Workflow
+### TLDR how to run this
+- There are 4 main directories.
+ - `bin`: we put some scripts the pipeline uses here.
+ - `data`: to put all input data.
+ - `results`: to write permanent result files
+ - the nextflow directory in which the `work` nextflow directory is created by default.
+  ```
+  C:.
+  └───nextflow
+      ├───handson
+      |   ├───bin
+      │   ├───data
+      │   │   └───reads
+      │   └───results
+      │       ├───ENCSR000COQ
+      │       ├───ENCSR000COR
+      │       └───ENCSR000CPO
+      └───work
+  ```
+
+- To start the first time. ``winpty docker run -it --volumes-from workspace --name nextflow_container nextflow/nextflow bash -c "nextflow run /nextflow_data/hands-on/main.nf -dsl2 -resume; tail -f /dev/null"``
+- If the container is not running. ``docker container start nextflow_container``
+- Rerun project. ``winpty docker exec -it nextflow_container bash -c "nextflow run /nextflow_data/hands-on/main.nf -dsl2 -resume; tail -f /dev/null"``
+
+### Nextflow running on win10 using gitbash
+- use a volume container `workspace` such as `docker run --name workspace -v "C:\\Users\\User\\Desktop\\data\\nextflow:/nextflow_data" -v "//var/run/docker.sock:/var/run/docker.sock" ubuntu:18.04`. This solves path mapping problems when docker containers are used in nextflow processes.
+- ``winpty docker run -it --volumes-from workspace nextflow/nextflow bash -c "nextflow run /nextflow_data/hands-on/main.nf -dsl2"``
+- use nextflow dsl2
+- Map the socket file. The socket is passed to be able to pull docker images from the nextflow container as a sibling container. For example:
+``winpty docker run -it -v "C:\\Users\\User\\Desktop\\data\\nextflow:/test" -v "//var/run/docker.sock:/var/run/docker.sock" nextflow/nextflow bash -c "docker pull cbcrg/callings-with-gatk:latest"``
+### fixing the resume capability
+- Since nextflow is running on docker; `-resume` will work only if the container is kept running. This is the function of `tail -f /dev/null`.
+- Launch the project with: `winpty docker run -it --volumes-from workspace --name nextflow_container nextflow/nextflow bash -c "nextflow run /nextflow_data/hands-on/main.nf -dsl2; tail -f /dev/null"`
+- Then resume with: `winpty docker exec -it nextflow_container bash -c "nextflow run /nextflow_data/hands-on/main.nf -dsl2 -resume; tail -f /dev/null"`
+
+### Nextflow specifics
+- $baseDir is the path of `main.nf`
+- `include` does not seem to support names starting with a digit.
+- it is likely that `results` path needs to be passed using `nexflow.config`
